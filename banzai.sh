@@ -73,7 +73,7 @@ fi
 ################################################################################
 # CHECK FOR DEPENDENCIES
 ################################################################################
-dependencies=($( echo pear cutadapt vsearch swarm seqtk python blastn R ))
+dependencies=($( echo pear  vsearch swarm seqtk python blastn R ))
 source "${SCRIPT_DIR}"/scripts/dependency_check.sh "${dependencies[@]}"
 
 # Load functions
@@ -430,7 +430,9 @@ for (( i=0; i < "${#FILE1[@]}"; i++ )); do
 		seqtk seq -A "${MERGED_READS}" > "${FILTERED_OUTPUT}"
 		echo
 	fi
-
+#MOncho adds his version of primer removal
+source "${SCRIPT_DIR}"/scripts/all_same_direction.sh "${FILTERED_OUTPUT}" "discard.fasta" "AGTTACNNTAGGGATAACAGCG" "CCGGTCTGAACTCAGATCANGT"
+#The output is a new version of 2_filtered.fasta
 	if [ "${HOARD}" = "NO" ]; then
 		rm "${MERGED_READS}"
 	fi
@@ -539,9 +541,9 @@ source "${SCRIPT_DIR}"/scripts/primer_removal.sh \
   "${PRIMER1}"  "${PRIMER2}" \
 	"${PRIMER_MISMATCH_PROPORTION}"  "${LENGTH_ROI_HALF}"
 
-# check for cutadapt/primer removal success.
+# check for /primer removal success.
 if [[ ! -s "${PRIMER_REMOVAL_OUT}" ]]; then
-  echo 'ERROR: cutadapt did not process reads correctly. This file is empty or absent:'
+  echo 'ERROR:  did not process reads correctly. This file is empty or absent:'
 	echo "${PRIMER_REMOVAL_OUT}"
   echo 'Aborting script'
 	echo
