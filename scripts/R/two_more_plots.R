@@ -18,7 +18,7 @@ l$Project<-"ELWHA"
 m$Project<-"Aquaculture"
 b<-rbind(l,m)
 print(str(b))
-
+toplot<-subset()
 p<- ggplot(data = to_plotA, aes(x=Rev, y=Fwd, fill=V3))   
 p<-p+ geom_raster()+scale_fill_distiller(palette = "Spectral" , name="# Reads")+theme_bw()+ggtitle("Library A")+
   theme(plot.title = element_text(hjust = 0.5),
