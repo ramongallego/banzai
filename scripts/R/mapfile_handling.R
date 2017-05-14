@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 
-setwd("/Users/jimmy.odonnell/Projects/Aquaculture_Diversity/banzai_out_20161206_1607")
+setwd("/Users/moncho/Google_Drive/Current_project_data/Tide/Kelly_HoodCanalTidal_20170413_done/output/banzai_out_20170508_2227")
 
 # specify otu mapfile
 otu_mapfile <- "all_lib/derep.map"
