@@ -431,7 +431,8 @@ for (( i=0; i < "${#FILE1[@]}"; i++ )); do
 		echo
 	fi
 #MOncho adds his version of primer removal
-source "${SCRIPT_DIR}"/scripts/all_same_direction.sh "${FILTERED_OUTPUT}" "discard.fasta" "AGTTACNNTAGGGATAACAGCG" "CCGGTCTGAACTCAGATCANGT"
+#TODO: soft code primers fr removal
+source "${SCRIPT_DIR}"/scripts/all_same_direction.sh "${FILTERED_OUTPUT}" "discard.fasta" "${PRIMER1}" "${PRIMER2}"
 #The output is a new version of 2_filtered.fasta
 	if [ "${HOARD}" = "NO" ]; then
 		rm "${MERGED_READS}"
