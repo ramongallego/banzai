@@ -1,7 +1,7 @@
 #-------------------------------------------------------------------------------
-
-setwd("/Users/moncho/Google_Drive/Current_project_data/Tide/Kelly_HoodCanalTidal_20170413_done/output/banzai_out_20170508_2227")
-
+library(dplyr)
+library(tidyr)
+setwd("~/Tide_COI/full/COI_Tides_Miseq_Full_run/full/banzai_out_20170921_1011/")
 # specify otu mapfile
 otu_mapfile <- "all_lib/derep.map"
 
@@ -34,6 +34,7 @@ otu_map_gt10 <- remove_rare(otu_map_clean, 10)
 
 # replace long format names with user-supplied names
 # first remove "sample=" prefix
+
 sample_map$V3 <- gsub("sample=", "", sample_map$V3)
 head(sample_map)
 rename_samples <- function(map_otu, map_sample){
@@ -44,7 +45,7 @@ otu_map_final <- rename_samples(otu_map_gt10, sample_map)
 class(otu_map_final)
 head(otu_map_final)
 
-otu_map_w <- xtabs(V3 ~ V2 + V1, data = otu_map_final)
+otu_map_w <- spread(otu_map_final, key=V2, value = V3, fill=0)
 dim(otu_map_w)
 
 # sort by column sums
@@ -53,3 +54,5 @@ otu_map_w <- otu_map_w[,order(colSums(otu_map_w), decreasing = TRUE)]
 otu_map_w[1:5,1:5]
 
 write.csv(otu_map_w, file = "otu_table.csv", quote = FALSE)
+row.names(otu_map_w)<-otu_map_w[,1]
+otu_map_w<-otu_map_w[,-1]
