@@ -1,0 +1,122 @@
+---
+title: "Contamination on barcodes"
+author: "Moncho"
+date: "2/24/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir="/Users/moncho/Documents/troubleshooting_eDNA/ELWHA/output/banzai_out_20170222_1607")
+
+```
+
+## Troubeshooting metabarcoding issues
+This R Markdown document shows the workflow to identify possible sources of error in recent metabarcoding analyses. The problem was detected when libraries from PCR replicates from the same DNA extract returned extremely different results, suggesting a contamination problem or another issue.
+
+```{r, echo=FALSE ,message=FALSE}
+library(gridExtra)
+library(stringr)
+library (ggplot2)
+library (reshape2)
+library(Biostrings)
+source('~/Documents/Scripts/remap_banzai_output.r')
+source(file ="/Users/moncho/Documents/Scripts/per_lib.r" )
+source('~/Documents/Scripts/per_lib.r')
+source('~/Documents/Scripts/fv.r')
+source('~/Documents/Scripts/distance_to_known.r')
+source('~/Documents/Scripts/Mon_rev_com.r')
+source("~/Documents/Scripts/multiplot.r")
+source("~/Documents/Scripts/string.diff.ex.r")
+
+```
+I run a smaller version of the ELWHA dataset with a modified version of banzai (), in which all paired reads were reoriented so all sequences will be read on the heavy strand. The purpose of this was to detect whether problems in the sample-identifier barcodes were happening in Fwd, Rev barcodes or both. **Note that in all our projects, Fwd and Rev barcodes are identical and mismatching barcodes are discarded for downstream analysis.
+
+Find the otu_map and smaple_map files
+```{r}
+otu_mapfile <- "all_lib/derep.map"
+# read otu map
+otu_map <- read.table(otu_mapfile, stringsAsFactors = FALSE, header = FALSE); rm(otu_mapfile)
+### specify sample mapfile
+sample_mapfile <- "sample_trans.tmp"
+# read sample map
+sample_map <- read.table(sample_mapfile, stringsAsFactors = FALSE, header = FALSE);rm(sample_mapfile)
+```
+I'm sure there are more efficient and elegant ways of doing this, but I split the fields containing the mapping and source into library, fwd and reverse barcodes, for both the otu_map and sample_map dfs
+```{r}
+
+sample_map[,4:6]<-with (sample_map, colsplit(V1,";",c("library","Fwd","Rev")))
+sample_map[,5:6]<-apply(sample_map[,5:6], 2, gsubseq)
+otu_map[,4:6]<-with (otu_map, colsplit(V2,";",c("library","Fwd","Rev")))
+otu_map[,5:6]<-apply(otu_map[,5:6],2,gsubseq)
+```
+Now I can create fields for remapping samples according to their Fwd and Reverse tags
+```{r}
+sample_map$lib_fwd<-with(sample_map, interaction(library, Fwd, drop=T))
+sample_map$lib_rev<-with(sample_map, interaction(library, Rev, drop=T))
+otu_map$lib_fwd<-with (otu_map,interaction(library,Fwd, drop=T))
+otu_map$lib_rev<-with (otu_map,interaction(library,Rev, drop=T))
+```
+Next, I run the rename function to change the V2 field of the otu_map to the matching sample, according to the lib-fwd-rev combination: only reads with matching barcodes are assigned to a sample.
+```{r echo=FALSE}
+
+```
+
+```{r }
+
+otu_map <- rename_samples(otu_map, sample_map)
+```
+This obviously will create a bunch of NAs: those reads which showed a barcode not present on the metadata sheet.
+Let's have a look at otu_map
+```{r}
+head(otu_map)
+```
+What's the average number of reads per sample? `r round( mean(aggregate(otu_map$V3, list(otu_map$V2),sum)[,2]),2)`
+So we are obviously working with a small dataset. Will run this whole thing with the full dataset ater on.  
+### Let's start the analysis of the barcodes  
+First we will calculate the differences between the fwd barcode and the reverse complement of the rev barcode: Those with 0 differences are perfect matches and should represent perfectly what's on the project metadata. In case we found 1-2 differences, we can attribute them to sequencing error, and we expect to find low numbers of them: All reads that have reached this point in the analysis have 100% similarity in the library barcode, so having more than 2 sequencing errors only 6bp away from a perfect match with the library barcode is unlikely. In case we find 3-6 differences between barcodes, we can point these to the presence of the wrong barcode in the tube.
+```{r}
+otu_map$Paired<-"NA"
+otu_map$diffs<-0
+for (i in 1:nrow(otu_map)){
+  otu_map$Paired[i]<-compare_strings(otu_map$Fwd[i],otu_map$Rev[i], otu_map$Paired[i])
+  otu_map$diffs[i]<-string.diff.ex(as.character(otu_map$Fwd)[i],as.character(reverseComplement(DNAString(as.character(otu_map$Rev)[i]))))
+}
+otu_map$Paired<-as.factor(otu_map$Paired)
+summary(otu_map$diffs); summary(otu_map$Paired)
+```
+Wow! Almost half of the reads got thrown away; 
+let's see how many did because the fwd barcode was not on the database, how many because of the reverse wasn't and how many just didn't match
+```{r, echo=F}
+all_tags<-read.csv(file="/Users/moncho/Google_Drive/Kelly_Lab/Primers/primer_tags/Metabarcoding tags.csv")
+
+all_tags<-as.character(all_tags[1:53,2])
+all_tags<-toupper(all_tags)
+all_tags_rev<-all_tags
+for (i in 1:length(all_tags)){
+  all_tags_rev[[i]]<-as.character(reverseComplement(DNAString(all_tags[[i]])))
+}
+```
+
+```{r}
+discarded_FWD<-otu_map[!(otu_map$Fwd %in% all_tags),]
+discarded_REV<-otu_map[!(otu_map$Rev %in% all_tags_rev),]
+kept_but_mismatched<-otu_map[(otu_map$Fwd %in% all_tags) & (otu_map$Rev %in% all_tags_rev)& (otu_map$Paired=="Unpaired"),]
+```
+Now, ugly function until I learn how to include the variable name in a custom made function
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
