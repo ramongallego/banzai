@@ -1,7 +1,7 @@
 #This is an R script, that given a folder with the results of banzai,
 #will create some plots and dfs with the missing and unexpected sampe barcodes found
 #As it is now, you have to input here the directory but working on it to launch from banzai.sh, given a OK in banzai.params.sh
-banzai.output="/Users/moncho/Current_project/Kelly_HoodCanalTidal_20170413_done_sub/output/banzai_out_20170508_1607"#Your directory here
+banzai.output="/Users/moncho/banzai_outputs/banzai_out_20171128_2303/"#Your directory here
 
 #And we need to load some R functions, and libraries
 library(gridExtra)
@@ -9,13 +9,13 @@ library(stringr)
 library (ggplot2)
 library (reshape2)
 library(Biostrings)
-source('scripts/R/remap_banzai_output.r')
-source('scripts/R/string.diff.ex.r')
-source('scripts/R/per_lib_with_only_green.r')
-source('scripts/R/fv.r')
-source('scripts/R/distance_to_known.r')
-source('scripts/R/Mon_rev_com.r')
-source("scripts/R/multiplot.r")
+source('remap_banzai_output.r')
+source('string.diff.ex.r')
+source('per_lib_with_only_green.r')
+source('fv.r')
+source('distance_to_known.r')
+source('Mon_rev_com.r')
+source("multiplot.r")
 #banzai_output_function<-function(banzai.output){
 #If we want to ake this a shiny app, then we could use the out folder as teh input variable
 
