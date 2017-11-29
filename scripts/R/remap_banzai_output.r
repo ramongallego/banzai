@@ -29,7 +29,7 @@ rename_fwd<-function(map_otu, map_sample){
 #once we have added the expected barcodes - according to the mapfile
 # and generates a series of plots with all the reads that didn't pass the Fwd or Reverse matching with the barcodes
 # Including 
-anlysis_df<-function(dataf){
+analysing_df<-function(dataf){
   temp.df<-as.data.frame(aggregate(dataf$V3, list(dataf$Rev, dataf$library),sum ))
   temp.df[,1]<-as.factor(temp.df[,1])
   temp.df[,2]<-as.factor(temp.df[,2])
