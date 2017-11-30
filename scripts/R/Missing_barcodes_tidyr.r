@@ -30,5 +30,6 @@ otu_map_tidy[,c("Fwd","Rev")]<-apply ()
 
 
 otu_map[,4:6]<-with (otu_map, colsplit(V2,";",c("library","Fwd","Rev")))
-otu_map[,5:6]<-apply(otu_map[,5:6], 2, gsubseq)
+otu_map[,5:6]<-apply(otu_map[,5:6], 2, function (x) {gsub("ID[0-9][A-Z]=","",x)}) #remove ID1...
+
 otu_map_no_singletons<-subset(otu_map, V3>1)
