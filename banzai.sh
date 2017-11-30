@@ -307,7 +307,7 @@ if [ "$ALREADY_CONCAT" = "YES" ]; then
 CONCAT_FILE="/Users/Moncho/banzai_outputs/banzai_out_20171129_2235/all_lib/demult_concat.fasta"
 
 echo "All library-level actions previously completed "
-echo "Using Concatenated file from " "${ALREADY_CONCAT}"
+echo "Using Concatenated file from " "${CONCAT_FILE}"
 
 else
 

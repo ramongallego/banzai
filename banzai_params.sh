@@ -16,7 +16,7 @@ SEQUENCING_METADATA="${PARENT_DIR}"/metadata.csv
 ################################################################################
 # This script will generate a directory (folder) containing the output of the script.
 # Where do you want this new folder to go?
-OUTPUT_DIRECTORY="${HOME}" #"${PARENT_DIR%/*}"
+OUTPUT_DIRECTORY="${HOME}"/banzai_outputs #"${PARENT_DIR%/*}"
 
 # You can optionally specify a folder into which the script copies a PDF containing some results.
 # The pdf is created by default in the analysis folder specified above, but
@@ -215,6 +215,10 @@ PEAR_OUTPUT='/Users/threeprime/Documents/Data/IlluminaData/12S/20140930/Analysis
 # Have the merged reads been quality filtered?
 ALREADY_FILTERED="NO" # [YES|NO]
 FILTERED_OUTPUT='/Users/threeprime/Documents/Data/IlluminaData/12S/20140930/Analysis_20141030_2020/2_filtered_renamed.fasta'
+
+# Have all library-level actions been completed?
+ALREADY_CONCAT="YES"
+NEW_CONCAT_DIR="/Users/Moncho/banzai_outputs/banzai_out_20171129_2235/all_lib"
 
 
 ################################################################################
