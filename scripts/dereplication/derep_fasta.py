@@ -6,49 +6,53 @@ Find and remove duplicate DNA sequences from a fasta file
 usage: python ./this_script.py infile.fasta 'ID1_' derep.fasta derep.map
 '''
 
-import sys
 import os
 from collections import Counter
+import fileinput
+import itertools
+import argparse
+import hashlib
 
-try:
-	infile = sys.argv[1]
-	sample_id_start  = sys.argv[2]
-	outfasta = sys.argv[3]
-	outmap = sys.argv[4]
+parser = argparse.ArgumentParser(
+	description = 'Remove and count duplicate sequences in a fasta file', 
+	)
 
-except:
-	raise RuntimeError, '\n\n\n\tusage: ./this_script.py <filename_to_sort> <sample_id_start> <output_fasta_filename> <output_map_filename> \n\n'
+parser.add_argument('-i', '--fasta_in',
+	help = 'File path for input file. Must be a fasta file with *no* wrapped lines!', 
+	required = True)
 
-kwargs = {
-		#_file to sort
-		'fname'		: infile,
+parser.add_argument('-s', '--sample_prefix',
+	help = 'First part of string identifying samples (e.g. "ID1=").', 
+	required = True)
 
-		# give a string that identifies the start of the sample identifier
-		'sampleID'	:	sample_id_start,
+parser.add_argument('-f', '--fasta_out',
+	help = 'File path for output fasta.', 
+	required = True)
 
-		#_name of fasta output. other options include:
-		# '{0:s}.seq'.format(infile),
-		# os.path.splitext(infile)[0]+'_derep.fasta',
-		'fasta_output'	: outfasta,
+parser.add_argument('-m', '--mapfile',
+	help = 'File path for output mapfile.', 
+	required = True)
 
-		#_name of output of ids to unique sequences
-		# 'map_output'	: os.path.splitext(infile)[0]+'_derep.map',
-		'map_output'	: outmap
-		}
+parser.add_argument('-H', '--hash',
+	help = 'Use hash output (SHA1) of sequence to name sequences?', 
+	choices = ["YES", "NO"], 
+	default = "NO", 
+	required = False)
 
+args = vars(parser.parse_args())
+
+infile = args['fasta_in']
+sample_id_start = args['sample_prefix']
+outfasta = args['fasta_out']
+outmap = args['mapfile']
+hash_arg = args['hash']
 
 #############################################################################_80
 #_main_#########################################################################
 ################################################################################
 
 
-def run_main(sampleID, fname=0, outidx='index.txt', **kw):
-	import fileinput
-	import os
-	import itertools
-
-	if os.path.exists(outidx):
-		os.unlink(outidx)
+def run_main(fname, sampleID, out_f, out_m, hash_id):
 
 	#_open input file
 	f = fileinput.input(fname)
@@ -59,7 +63,7 @@ def run_main(sampleID, fname=0, outidx='index.txt', **kw):
 	# sample_pattern = re.compile(samplestringID + "(.*)", re.flags)
 
 	#_loop over two lines of input
-	for line0, line1 in itertools.izip_longest(*[f]*2):
+	for line0, line1 in itertools.izip_longest(f,f):
 		seq_id = line0.replace('\n','').replace('>','')#_don't .strip()
 		sample_id = sampleID + '{0:s}'.format(seq_id.split(sampleID)[1])
 		dna_str = line1.strip()
@@ -75,10 +79,14 @@ def run_main(sampleID, fname=0, outidx='index.txt', **kw):
 		else:
 			dict_uniqseq[dna_str] = [idx_id]
 
-	keys_by_length = sorted(dict_uniqseq,
-	                        key=lambda k: len(dict_uniqseq[k]), reverse=True)
-	write_fasta(dict_uniqseq, keys_by_length, **kw)
-	write_map(list_id, dict_uniqseq, keys_by_length, list_id, **kw)
+	keys_by_length = sorted(dict_uniqseq, 
+						key=lambda k: len(dict_uniqseq[k]), reverse = True)
+	if hash_id == 'YES':
+		write_fasta_hash(dict_uniqseq, keys_by_length, out_f)
+		write_map_hash(list_id, dict_uniqseq, keys_by_length, out_m)		
+	else:
+		write_fasta(dict_uniqseq, keys_by_length, out_f)
+		write_map(list_id, dict_uniqseq, keys_by_length, out_m)
 
 	#_close input
 	f.close()
@@ -88,25 +96,43 @@ def run_main(sampleID, fname=0, outidx='index.txt', **kw):
 #_end_main_#####################################################################
 ################################################################################
 
-def write_fasta(dna_dict, sorted_keys, fasta_output='fasta_output.file', **kwargs):
+def write_fasta(dna_dict, sorted_keys, fasta_output = 'fasta_output.file'):
 	''' write fasta file of unique sequences '''
 	with open(fasta_output, 'w') as f:
 		for index, key in enumerate(sorted_keys):
-			# if len(dna_dict[key]) > 1:
 			f.write('>DUP_{0:n}'.format(index+1) +
 			        ';size={0:n}\n'.format(len(dna_dict[key])) +
 					'{0:s}\n'.format(key))
 
-def write_map(id_list, dna_dict, sorted_keys, sample_list, map_output='map_output.file', **kwargs):
+def write_fasta_hash(dna_dict, sorted_keys, fasta_output = 'fasta_output.file'):
+	''' write fasta file of unique sequences using hash as sequence id'''
+	with open(fasta_output, 'w') as f:
+		for index, key in enumerate(sorted_keys):
+			f.write('>SHA1={0:s}'.format(hashlib.sha1(key).hexdigest()) +
+			        ';size={0:n}\n'.format(len(dna_dict[key])) +
+					'{0:s}\n'.format(key))
+
+def write_map(id_list, dna_dict, sorted_keys, map_output = 'map_output.file'):
 	'''write two column file of sequence name from input and sequence name in output'''
 	with open(map_output, 'w') as f:
 		for index, key in enumerate(sorted_keys):
-			count_per_sample = Counter([sample_list[i] for i in dna_dict[key]]).most_common()
+			count_per_sample = Counter([id_list[i] for i in dna_dict[key]]).most_common()
 		    	f.write('\n'.join([
 					'DUP_{0:n}'.format(index+1) + '\t' +
 			        '{0:s}'.format(k) + '\t' +
 					'{0:n}'.format(v)
 					for k, v in count_per_sample]) + '\n')
 
+def write_map_hash(id_list, dna_dict, sorted_keys, map_output = 'map_output.file'):
+	'''write two column file of sequence name from input and sequence name in output'''
+	with open(map_output, 'w') as f:
+		for index, key in enumerate(sorted_keys):
+			count_per_sample = Counter([id_list[i] for i in dna_dict[key]]).most_common()
+		    	f.write('\n'.join([
+					'SHA1={0:s}'.format(hashlib.sha1(key).hexdigest()) + '\t' +
+			        '{0:s}'.format(k) + '\t' +
+					'{0:n}'.format(v)
+					for k, v in count_per_sample]) + '\n')
+
 if __name__ == '__main__':
-	run_main(**kwargs)
+	run_main(fname = infile, sampleID = sample_id_start, out_f = outfasta, out_m = outmap, hash_id = hash_arg)

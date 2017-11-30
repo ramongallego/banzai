@@ -5,7 +5,7 @@
 # INPUT
 ################################################################################
 # What is the file path to the directory containing all of the libraries/reads?
-PARENT_DIR="${SCRIPT_DIR}""/data/PS_16S"
+PARENT_DIR="/Users/Moncho/Google_Drive/Current_project_data/OA_COI/171122"
 
 # Where is the sequencing metadata file? (SEE FORMATTING GUIDELINES IN README!)
 SEQUENCING_METADATA="${PARENT_DIR}"/metadata.csv
@@ -156,6 +156,12 @@ remove_singletons="YES"  # [YES|NO]
 
 
 ################################################################################
+# DEREPLICATION
+################################################################################
+# Should the sequence ID after dereplication be the output of a hash algorithm?
+USE_HASH="YES"
+
+################################################################################
 # CLUSTER OTUs
 ################################################################################
 # Would you like to cluster sequences into OTUs based on similarity?
@@ -218,13 +224,16 @@ FILTERED_OUTPUT='/Users/threeprime/Documents/Data/IlluminaData/12S/20140930/Anal
 # recommendation: NO, unless testing or troubleshooting
 HOARD="YES"
 
-# Would you like to compress extraneous intermediate files once the analysis is finished? YES/NO
-PERFORM_CLEANUP="YES"
-
 # Is it ok to rename the sequences within a fasta file?
 # This will only remove info about the machine; reads can still be traced back to origin in fastq.
 # This will happen after the fastq has been converted to a fasta file at the quality filtering step.
 RENAME_READS="NO"
+
+# Make wide format copies of the duplicate and OTU map files?
+WIDE_FORMAT="NO"
+
+# Would you like to compress extraneous intermediate files once the analysis is finished? YES/NO
+PERFORM_CLEANUP="YES"
 
 # If you want to receive a text message when the pipeline finishes, input your number here:
 EMAIL_ADDRESS="4077443377@tmomail.net"
