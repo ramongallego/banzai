@@ -7,7 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir="/Users/moncho/Documents/troubleshooting_eDNA/ELWHA/output/banzai_out_20170222_1607")
+knitr::opts_knit$set(root.dir="/Users/moncho/banzai_outputs/banzai_out_20171128_2303")
 
 ```
 
@@ -20,14 +20,13 @@ library(stringr)
 library (ggplot2)
 library (reshape2)
 library(Biostrings)
-source('~/Documents/Scripts/remap_banzai_output.r')
-source(file ="/Users/moncho/Documents/Scripts/per_lib.r" )
-source('~/Documents/Scripts/per_lib.r')
-source('~/Documents/Scripts/fv.r')
-source('~/Documents/Scripts/distance_to_known.r')
-source('~/Documents/Scripts/Mon_rev_com.r')
-source("~/Documents/Scripts/multiplot.r")
-source("~/Documents/Scripts/string.diff.ex.r")
+source('~/banzai/scripts/R/remap_banzai_output.r')
+source('~/banzai/scripts/R/per_lib.r')
+source('~/banzai/scripts/R/fv.r')
+source('~/banzai/scripts/R/distance_to_known.r')
+source('~/banzai/scripts/R/Mon_rev_com.r')
+source("~/banzai/scripts/R/multiplot.r")
+source("~/banzai/scripts/R/string.diff.ex.r")
 
 ```
 I run a smaller version of the ELWHA dataset with a modified version of banzai (), in which all paired reads were reoriented so all sequences will be read on the heavy strand. The purpose of this was to detect whether problems in the sample-identifier barcodes were happening in Fwd, Rev barcodes or both. **Note that in all our projects, Fwd and Rev barcodes are identical and mismatching barcodes are discarded for downstream analysis.
@@ -58,9 +57,6 @@ otu_map$lib_fwd<-with (otu_map,interaction(library,Fwd, drop=T))
 otu_map$lib_rev<-with (otu_map,interaction(library,Rev, drop=T))
 ```
 Next, I run the rename function to change the V2 field of the otu_map to the matching sample, according to the lib-fwd-rev combination: only reads with matching barcodes are assigned to a sample.
-```{r echo=FALSE}
-
-```
 
 ```{r }
 

@@ -2,6 +2,8 @@
 #will create some plots and dfs with the missing and unexpected sampe barcodes found
 #As it is now, you have to input here the directory but working on it to launch from banzai.sh, given a OK in banzai.params.sh
 banzai.output="/Users/moncho/banzai_outputs/banzai_out_20171128_2303/"#Your directory here
+report.dir=paste0(banzai.output,"report")
+dir.create(report.dir)
 
 #And we need to load some R functions, and libraries
 library(gridExtra)
@@ -56,15 +58,16 @@ otu_map_no_singletons$library<-as.factor(otu_map_no_singletons$library)
   #Plots are .plot, missing and unexpectedF and R, and a df to create a second plot
   #Plots: showd them on screen and make a pdf
     b<-grep(pattern = ".plot", x = names(tett2))
-    library("gridExtra")
+
     heatmaps<-marrangeGrob(tett2[b],ncol = 1, nrow = 2)
     heatmaps
    t<-multiplot(tett2[b], cols=1)
-
-   png(paste0(banzai.output,"/A.png"))
+#If we are going to start making plots, set wd as destination
+setwd(report.dir)
+      png("A.png")
    tett2[b][1]
    dev.off()
-   png(paste0(banzai.output,"/all.png"))
+   png("all.png")
    heatmaps
    dev.off()
 #Seems like there is something really wrong. Do a similar plot only including the intended barcodes
@@ -86,7 +89,7 @@ otu_map_no_singletons$library<-as.factor(otu_map_no_singletons$library)
         theme(plot.title = element_text(hjust = 0.5),
               axis.text.y = element_text(face="bold"),
               axis.text.x = element_text(face="bold", angle = 90))
-      p+scale_fill_distiller(palette = "Spectral" , name="log # Reads", trans='log')+ggsave(filename =paste0(banzai.output,"/Library_",LETTERS[i],"heatmap_log.png") )
+      #p+scale_fill_distiller(palette = "Spectral" , name="log # Reads", trans='log')+ggsave(filename =paste0(banzai.output,"/Library_",LETTERS[i],"heatmap_log.png") )
       p+scale_fill_distiller(palette = "Spectral" , name="# Reads")+ggsave(filename =paste0(banzai.output,"/Library_",LETTERS[i],"heatmap.png") )
     }
  #Now assign to which Tag each dup could be assigned by its Fwd read

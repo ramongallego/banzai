@@ -3,7 +3,7 @@
 # create a subset of the fastq files stored in a specified directory
 
 # This variable can be changed to grab different numbers of lines (4K lines = 1K sequences)
-N_lines=4000
+N_lines=40000
 
 #take argument 1 and set it to variable my_dir
 my_dir="${1}"
