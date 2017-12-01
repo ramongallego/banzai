@@ -5,7 +5,7 @@
 # INPUT
 ################################################################################
 # What is the file path to the directory containing all of the libraries/reads?
-PARENT_DIR="/Users/Moncho/Google_Drive/Current_project_data/OA_COI/171122"
+PARENT_DIR="${BANZAI_DIR}"/data/PS_16S
 
 # Where is the sequencing metadata file? (SEE FORMATTING GUIDELINES IN README!)
 SEQUENCING_METADATA="${PARENT_DIR}"/metadata.csv
@@ -16,7 +16,7 @@ SEQUENCING_METADATA="${PARENT_DIR}"/metadata.csv
 ################################################################################
 # This script will generate a directory (folder) containing the output of the script.
 # Where do you want this new folder to go?
-OUTPUT_DIRECTORY="${HOME}"/banzai_outputs #"${PARENT_DIR%/*}"
+OUTPUT_DIRECTORY="${HOME}" #"${PARENT_DIR%/*}"
 
 # You can optionally specify a folder into which the script copies a PDF containing some results.
 # The pdf is created by default in the analysis folder specified above, but
