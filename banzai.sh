@@ -301,11 +301,23 @@ CONCAT_DIR="${OUTPUT_DIR}"/all_lib
 mkdir "${CONCAT_DIR}"
 CONCAT_FILE="${CONCAT_DIR}"/demult_concat.fasta
 
+################################################################################
 #Control the flow for now, just put the whole library loop at the end of the
 #else statement
 if [ "$ALREADY_CONCAT" = "YES" ]; then
-CONCAT_FILE="/Users/Moncho/banzai_outputs/banzai_out_20171129_2235/all_lib/demult_concat.fasta"
+CONCAT_FILE="${NEW_CONCAT_DIR}"/demult_concat.fasta
 
+	if [[ -s "${CONCAT_FILE}" ]] ; then
+		echo "All library-level actions previously completed "
+		echo "Using Concatenated file from " "${CONCAT_FILE}"
+	else
+		if [[ -s "${CONCAT_FILE}".gz ]]; then
+			echo "Decompressing demult_concat.fasta"
+			"${ZIPPER}" -d "${CONCAT_FILE}".gz
+		else
+			echo "Could not find already concatenated file"
+		fi
+	fi			
 echo "All library-level actions previously completed "
 echo "Using Concatenated file from " "${CONCAT_FILE}"
 
