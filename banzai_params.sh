@@ -218,7 +218,7 @@ FILTERED_OUTPUT='/Users/threeprime/Documents/Data/IlluminaData/12S/20140930/Anal
 
 # Have all library-level actions been completed?
 ALREADY_CONCAT="YES"
-NEW_CONCAT_DIR="/Users/Moncho/banzai_outputs/banzai_out_20171129_2235/all_lib"
+NEW_CONCAT_DIR="/Users/Moncho/banzai_out_20171130_2231/all_lib"
 
 
 ################################################################################
