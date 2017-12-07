@@ -317,7 +317,7 @@ CONCAT_FILE="${NEW_CONCAT_DIR}"/demult_concat.fasta
 		else
 			echo "Could not find already concatenated file"
 		fi
-	fi			
+	fi
 echo "All library-level actions previously completed "
 echo "Using Concatenated file from " "${CONCAT_FILE}"
 
@@ -561,7 +561,10 @@ done
 ################################################################################
 PRIMER_REM_ID1_ALL="${CONCAT_DIR}"/no_primer_byid1.fasta
 # cat "${OUTPUT_DIR}"/*/demult.fasta >> "${PRIMER_REM_ID1_ALL}"
+
+################################
 fi #End of flow control
+
 ################################################################################
 # PRIMER REMOVAL
 ################################################################################
